@@ -1,0 +1,52 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
+
+android {
+    compileSdkPreview "android-S"
+
+    defaultConfig {
+        applicationId "com.alirnp.watch"
+        minSdkPreview "S"
+        targetSdkPreview "S"
+        versionCode 1
+        versionName "1.0"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.core:core-ktx:1.6.0'
+    implementation 'com.google.android.gms:play-services-wearable:17.1.0'
+    implementation 'androidx.percentlayout:percentlayout:1.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.wear:wear:1.2.0'
+    implementation project(path: ':data')
+    implementation project(path: ':domain')
+
+    // Coroutine Lifecycle Scopes
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
+
+    // Koin
+    implementation "io.insert-koin:koin-core:${project.koin_version}"
+    implementation "io.insert-koin:koin-android:${project.koin_version}"
+    implementation "io.insert-koin:koin-android-viewmodel:${project.koin_version}"
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+}

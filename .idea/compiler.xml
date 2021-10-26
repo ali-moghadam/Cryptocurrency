@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.7">
+      <module name="Cryptocurrency.app" target="11" />
+      <module name="Cryptocurrency.data" target="11" />
+      <module name="Cryptocurrency.watch" target="11" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
