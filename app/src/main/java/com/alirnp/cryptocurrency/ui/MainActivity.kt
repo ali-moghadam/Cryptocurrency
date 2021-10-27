@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.alirnp.cryptocurrency.ui.adapters.CoinAdapter
-import com.alirnp.cryptocurrency.viewModel.CoinViewModel
+import com.alirnp.common.viewModel.CoinViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import androidx.recyclerview.widget.DividerItemDecoration

@@ -1,12 +1,13 @@
-package com.alirnp.watch.di
+package com.alirnp.common.di
 
+
+import com.alirnp.common.viewModel.CoinViewModel
 import com.alirnp.data.mapper.CoinMapper
 import com.alirnp.data.remote.CoinApi
 import com.alirnp.data.repository.CoinRepositoryImpl
 import com.alirnp.domain.core.Constants
 import com.alirnp.domain.repository.CoinRepository
 import com.alirnp.domain.useCase.GetCoinUseCase
-import com.alirnp.watch.viewModel.CoinViewModel
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit

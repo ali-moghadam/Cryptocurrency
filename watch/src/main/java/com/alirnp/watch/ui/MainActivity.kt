@@ -5,13 +5,12 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.wear.widget.WearableLinearLayoutManager
+import com.alirnp.common.viewModel.CoinViewModel
 import com.alirnp.domain.core.Resource
 import com.alirnp.domain.model.Coin
 import com.alirnp.watch.databinding.ActivityMainBinding
 import com.alirnp.watch.ui.adapters.CoinAdapter
-import com.alirnp.watch.viewModel.CoinViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 

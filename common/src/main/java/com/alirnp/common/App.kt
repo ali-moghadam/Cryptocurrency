@@ -1,7 +1,7 @@
-package com.alirnp.watch
+package com.alirnp.common
 
 import android.app.Application
-import com.alirnp.watch.di.appModule
+import com.alirnp.common.di.appModule
 import org.koin.core.context.startKoin
 
 class App : Application()  {

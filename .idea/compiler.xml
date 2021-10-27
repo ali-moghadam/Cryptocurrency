@@ -3,6 +3,7 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.7">
       <module name="Cryptocurrency.app" target="11" />
+      <module name="Cryptocurrency.common" target="11" />
       <module name="Cryptocurrency.data" target="11" />
       <module name="Cryptocurrency.watch" target="11" />
     </bytecodeTargetLevel>
