@@ -11,6 +11,6 @@ java {
 dependencies {
 
     // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${project.coroutine_version}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${project.coroutine_version}"
 }

@@ -13,6 +13,10 @@ android {
         versionCode 1
         versionName "1.0"
 
+        configurations.all {
+            resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
+        }
+
     }
 
     buildTypes {
@@ -28,27 +32,28 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'com.google.android.gms:play-services-wearable:17.1.0'
-    implementation 'androidx.percentlayout:percentlayout:1.0.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'androidx.wear:wear:1.2.0'
     implementation project(path: ':data')
     implementation project(path: ':domain')
     implementation project(path: ':common')
 
+    implementation "androidx.wear:wear:${project.wear_version}"
+    implementation "androidx.percentlayout:percentlayout:${project.percentlayout_version}"
+    implementation "androidx.core:core-ktx:${project.ktx_version}"
+    implementation "com.google.android.gms:play-services-wearable:${project.wearable_version}"
+    implementation "androidx.legacy:legacy-support-v4:${project.legacy_support_version}"
+    implementation "androidx.recyclerview:recyclerview:${project.recyclerview_version}"
+
     // Coroutine Lifecycle Scopes
-    api "androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1"
-    api "androidx.lifecycle:lifecycle-runtime-ktx:2.3.1"
+    api "androidx.lifecycle:lifecycle-viewmodel-ktx:${project.coroutine_lifecycle_version}"
+    api "androidx.lifecycle:lifecycle-runtime-ktx:${project.coroutine_lifecycle_version}"
 
     // Koin
     api "io.insert-koin:koin-core:${project.koin_version}"
-    api "io.insert-koin:koin-android:$project.koin_version"
+    api "io.insert-koin:koin-android:${project.koin_version}"
     api "io.insert-koin:koin-android-viewmodel:${project.koin_version}"
 
     // Retrofit
-    api 'com.squareup.retrofit2:retrofit:2.9.0'
-    api 'com.squareup.retrofit2:converter-gson:2.9.0'
+    api "com.squareup.retrofit2:retrofit:${project.retrofit_version}"
+    api "com.squareup.retrofit2:converter-gson:${project.retrofit_version}"
 
 }
