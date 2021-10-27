@@ -1,7 +1,7 @@
-package com.alirnp.cryptocurrency
+package com.alirnp.watch
 
 import android.app.Application
-import com.alirnp.cryptocurrency.di.appModule
+import com.alirnp.watch.di.appModule
 import org.koin.core.context.startKoin
 
 class App : Application()  {

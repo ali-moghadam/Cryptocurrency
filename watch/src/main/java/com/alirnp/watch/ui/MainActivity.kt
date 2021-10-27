@@ -1,29 +1,29 @@
-package com.alirnp.cryptocurrency.ui
+package com.alirnp.watch.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.alirnp.cryptocurrency.ui.adapters.CoinAdapter
-import com.alirnp.cryptocurrency.viewModel.CoinViewModel
-import org.koin.android.viewmodel.ext.android.viewModel
-import org.koin.core.KoinComponent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.alirnp.cryptocurrency.databinding.ActivityMainBinding
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.wear.widget.WearableLinearLayoutManager
 import com.alirnp.domain.core.Resource
 import com.alirnp.domain.model.Coin
+import com.alirnp.watch.databinding.ActivityMainBinding
+import com.alirnp.watch.ui.adapters.CoinAdapter
+import com.alirnp.watch.viewModel.CoinViewModel
+import org.koin.android.viewmodel.ext.android.viewModel
+import org.koin.core.KoinComponent
 
+class MainActivity : AppCompatActivity() , KoinComponent{
 
-class MainActivity : AppCompatActivity(), KoinComponent  {
-
-    private lateinit var binding : ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
     private val coinViewModel: CoinViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(LayoutInflater.from(this)).apply {
+
+        binding = ActivityMainBinding.inflate(layoutInflater).apply {
             setContentView(this.root)
         }
 
@@ -53,22 +53,23 @@ class MainActivity : AppCompatActivity(), KoinComponent  {
 
     private fun showData(data: List<Coin>) {
         val adapter = CoinAdapter(data)
-        val layoutManager = LinearLayoutManager(this)
+        val layoutManager = WearableLinearLayoutManager(this)
 
         val dividerItemDecoration = DividerItemDecoration(
-            binding.recyclerViewCoin.context,
+            binding.wearableRecyclerViewCoins.context,
             layoutManager.orientation
         )
 
-        binding.recyclerViewCoin.setHasFixedSize(true)
-        binding.recyclerViewCoin.addItemDecoration(dividerItemDecoration)
-        binding.recyclerViewCoin.layoutManager = layoutManager
-        binding.recyclerViewCoin.adapter = adapter
+        binding.wearableRecyclerViewCoins.setHasFixedSize(true)
+        binding.wearableRecyclerViewCoins.isEdgeItemsCenteringEnabled = true
+        binding.wearableRecyclerViewCoins.addItemDecoration(dividerItemDecoration)
+        binding.wearableRecyclerViewCoins.layoutManager = layoutManager
+        binding.wearableRecyclerViewCoins.adapter = adapter
     }
 
 
     private fun showLoading(show: Boolean) {
         binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
-        binding.recyclerViewCoin.visibility = if (show.not()) View.VISIBLE else View.GONE
+        binding.wearableRecyclerViewCoins.visibility = if (show.not()) View.VISIBLE else View.GONE
     }
 }

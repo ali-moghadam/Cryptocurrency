@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/box_inset_layout_padding"
-    tools:context=".MainActivity"
+    tools:context=".ui.MainActivity"
     tools:deviceIds="wear">
 
     <FrameLayout
@@ -14,11 +14,18 @@
         android:padding="@dimen/inner_frame_layout_padding"
         app:layout_boxedEdges="all">
 
-        <TextView
-            android:id="@+id/text"
+        <androidx.wear.widget.WearableRecyclerView
+            android:id="@+id/wearableRecyclerView_coins"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_coin"
+            android:scrollbars="vertical" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="hello_world" />
+            android:layout_gravity="center" />
 
     </FrameLayout>
 </androidx.wear.widget.BoxInsetLayout>
