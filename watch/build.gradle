@@ -4,18 +4,14 @@ plugins {
 }
 
 android {
-    compileSdkPreview "android-S"
+    compileSdk 30
 
     defaultConfig {
         applicationId "com.alirnp.watch"
-        minSdkPreview "S"
-        targetSdkPreview "S"
+        minSdk 23
+        targetSdk 30
         versionCode 1
         versionName "1.0"
-
-        configurations.all {
-            resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
-        }
 
     }
 
@@ -36,7 +32,7 @@ dependencies {
     implementation project(path: ':domain')
     implementation project(path: ':common')
 
-    implementation "androidx.wear:wear:${project.wear_version}"
+    implementation "com.google.android.material:material:${project.material_version}"
     implementation "androidx.percentlayout:percentlayout:${project.percentlayout_version}"
     implementation "androidx.core:core-ktx:${project.ktx_version}"
     implementation "com.google.android.gms:play-services-wearable:${project.wearable_version}"

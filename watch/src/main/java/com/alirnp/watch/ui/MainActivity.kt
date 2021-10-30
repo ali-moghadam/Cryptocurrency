@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.wear.widget.WearableLinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.alirnp.common.viewModel.CoinViewModel
 import com.alirnp.domain.core.Resource
 import com.alirnp.domain.model.Coin
@@ -52,7 +52,8 @@ class MainActivity : AppCompatActivity() , KoinComponent{
 
     private fun showData(data: List<Coin>) {
         val adapter = CoinAdapter(data)
-        val layoutManager = WearableLinearLayoutManager(this)
+      //  val layoutManager = WearableLinearLayoutManager(this)
+        val layoutManager = LinearLayoutManager(this)
 
         val dividerItemDecoration = DividerItemDecoration(
             binding.wearableRecyclerViewCoins.context,
@@ -60,7 +61,7 @@ class MainActivity : AppCompatActivity() , KoinComponent{
         )
 
         binding.wearableRecyclerViewCoins.setHasFixedSize(true)
-        binding.wearableRecyclerViewCoins.isEdgeItemsCenteringEnabled = true
+       // binding.wearableRecyclerViewCoins.isEdgeItemsCenteringEnabled = true
         binding.wearableRecyclerViewCoins.addItemDecoration(dividerItemDecoration)
         binding.wearableRecyclerViewCoins.layoutManager = layoutManager
         binding.wearableRecyclerViewCoins.adapter = adapter
