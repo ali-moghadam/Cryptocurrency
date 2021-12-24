@@ -13,409 +13,332 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alirnp.watch.ui;
+package com.alirnp.watch.ui
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.util.AttributeSet;
-import android.view.Gravity;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowInsets;
-import android.widget.FrameLayout;
-
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RestrictTo;
-import androidx.annotation.StyleRes;
-import androidx.annotation.UiThread;
-
-import com.alirnp.watch.R;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import android.content.Context
+import android.content.res.Resources
+import android.graphics.Rect
+import android.graphics.drawable.Drawable
+import android.util.AttributeSet
+import android.view.Gravity
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.annotation.IntDef
+import androidx.annotation.RestrictTo
+import androidx.annotation.StyleRes
+import androidx.annotation.UiThread
+import com.alirnp.watch.R
 
 /**
  * BoxInsetLayout is a screen shape-aware ViewGroup that can box its children in the center
- * square of a round screen by using the {@code layout_boxedEdges} attribute. The values for this attribute
- * specify the child's edges to be boxed in: {@code left|top|right|bottom} or {@code all}. The
- * {@code layout_boxedEdges} attribute is ignored on a device with a rectangular screen.
+ * square of a round screen by using the `layout_boxedEdges` attribute. The values for this attribute
+ * specify the child's edges to be boxed in: `left|top|right|bottom` or `all`. The
+ * `layout_boxedEdges` attribute is ignored on a device with a rectangular screen.
  */
 @UiThread
-public class BoxInsetLayout extends ViewGroup {
-
-    private static final float FACTOR = 0.146447f; //(1 - sqrt(2)/2)/2
-    private static final int DEFAULT_CHILD_GRAVITY = Gravity.TOP | Gravity.START;
-
-    private final int mScreenHeight;
-    private final int mScreenWidth;
-
-    private boolean mIsRound;
-    private Rect mForegroundPadding;
-    private Rect mInsets;
-    private Drawable mForegroundDrawable;
-
-    /**
-     * Simple constructor to use when creating a view from code.
-     *
-     * @param context The {@link Context} the view is running in, through which it can access
-     *                the current theme, resources, etc.
-     */
-    public BoxInsetLayout(@NonNull Context context) {
-        this(context, null);
-    }
-
-    /**
-     * Constructor that is called when inflating a view from XML. This is called when a view is
-     * being constructed from an XML file, supplying attributes that were specified in the XML
-     * file. This version uses a default style of 0, so the only attribute values applied are those
-     * in the Context's Theme and the given AttributeSet.
-     * <p>
-     * <p>
-     * The method onFinishInflate() will be called after all children have been added.
-     *
-     * @param context The {@link Context} the view is running in, through which it can access
-     *                the current theme, resources, etc.
-     * @param attrs   The attributes of the XML tag that is inflating the view.
-     */
-    public BoxInsetLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    /**
-     * Perform inflation from XML and apply a class-specific base style from a theme attribute.
-     * This constructor allows subclasses to use their own base style when they are inflating.
-     *
-     * @param context  The {@link Context} the view is running in, through which it can
-     *                 access the current theme, resources, etc.
-     * @param attrs    The attributes of the XML tag that is inflating the view.
-     * @param defStyle An attribute in the current theme that contains a reference to a style
-     *                 resource that supplies default values for the view. Can be 0 to not look for
-     *                 defaults.
-     */
-    public BoxInsetLayout(@NonNull Context context, @Nullable AttributeSet attrs, @StyleRes int
-            defStyle) {
-        super(context, attrs, defStyle);
-        // make sure we have a foreground padding object
+class BoxInsetLayout @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    @StyleRes defStyle: Int = 0
+) : ViewGroup(context, attrs, defStyle) {
+    private val mScreenHeight: Int
+    private val mScreenWidth: Int
+    private var mIsRound = false
+    private var mForegroundPadding: Rect? = null
+    private var mInsets: Rect? = null
+    private var mForegroundDrawable: Drawable? = null
+    override fun setForeground(drawable: Drawable) {
+        super.setForeground(drawable)
+        mForegroundDrawable = drawable
         if (mForegroundPadding == null) {
-            mForegroundPadding = new Rect();
-        }
-        if (mInsets == null) {
-            mInsets = new Rect();
-        }
-        mScreenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-        mScreenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
-    }
-
-    @Override
-    public void setForeground(Drawable drawable) {
-        super.setForeground(drawable);
-        mForegroundDrawable = drawable;
-        if (mForegroundPadding == null) {
-            mForegroundPadding = new Rect();
+            mForegroundPadding = Rect()
         }
         if (mForegroundDrawable != null) {
-            drawable.getPadding(mForegroundPadding);
+            drawable.getPadding(mForegroundPadding!!)
         }
     }
 
-    @Override
-    public LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new BoxInsetLayout.LayoutParams(getContext(), attrs);
+    override fun generateLayoutParams(attrs: AttributeSet): LayoutParams {
+        return LayoutParams(context, attrs)
     }
 
-    @Override
-    @SuppressWarnings("deprecation") /* getSystemWindowInsetXXXX */
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        mIsRound = getResources().getConfiguration().isScreenRound();
-        WindowInsets insets = getRootWindowInsets();
-        mInsets.set(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(),
-                insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+    /* getSystemWindowInsetXXXX */
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        mIsRound = resources.configuration.isScreenRound
+        val insets = rootWindowInsets
+        mInsets!![insets.systemWindowInsetLeft, insets.systemWindowInsetTop, insets.systemWindowInsetRight] =
+            insets.systemWindowInsetBottom
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int count = getChildCount();
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val count = childCount
         // find max size
-        int maxWidth = 0;
-        int maxHeight = 0;
-        int childState = 0;
-        for (int i = 0; i < count; i++) {
-            final View child = getChildAt(i);
-            if (child.getVisibility() != GONE) {
-                LayoutParams lp = (BoxInsetLayout.LayoutParams) child.getLayoutParams();
-                int marginLeft = 0;
-                int marginRight = 0;
-                int marginTop = 0;
-                int marginBottom = 0;
+        var maxWidth = 0
+        var maxHeight = 0
+        var childState = 0
+        for (i in 0 until count) {
+            val child = getChildAt(i)
+            if (child.visibility != GONE) {
+                val lp = child.layoutParams as LayoutParams
+                var marginLeft = 0
+                var marginRight = 0
+                var marginTop = 0
+                var marginBottom = 0
                 if (mIsRound) {
                     // round screen, check boxed, don't use margins on boxed
-                    if ((lp.boxedEdges & LayoutParams.BOX_LEFT) == 0) {
-                        marginLeft = lp.leftMargin;
+                    if (lp.boxedEdges and LayoutParams.BOX_LEFT == 0) {
+                        marginLeft = lp.leftMargin
                     }
-                    if ((lp.boxedEdges & LayoutParams.BOX_RIGHT) == 0) {
-                        marginRight = lp.rightMargin;
+                    if (lp.boxedEdges and LayoutParams.BOX_RIGHT == 0) {
+                        marginRight = lp.rightMargin
                     }
-                    if ((lp.boxedEdges & LayoutParams.BOX_TOP) == 0) {
-                        marginTop = lp.topMargin;
+                    if (lp.boxedEdges and LayoutParams.BOX_TOP == 0) {
+                        marginTop = lp.topMargin
                     }
-                    if ((lp.boxedEdges & LayoutParams.BOX_BOTTOM) == 0) {
-                        marginBottom = lp.bottomMargin;
+                    if (lp.boxedEdges and LayoutParams.BOX_BOTTOM == 0) {
+                        marginBottom = lp.bottomMargin
                     }
                 } else {
                     // rectangular, ignore boxed, use margins
-                    marginLeft = lp.leftMargin;
-                    marginTop = lp.topMargin;
-                    marginRight = lp.rightMargin;
-                    marginBottom = lp.bottomMargin;
+                    marginLeft = lp.leftMargin
+                    marginTop = lp.topMargin
+                    marginRight = lp.rightMargin
+                    marginBottom = lp.bottomMargin
                 }
-                measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
-                maxWidth = Math.max(maxWidth, child.getMeasuredWidth() + marginLeft + marginRight);
-                maxHeight = Math.max(maxHeight,
-                        child.getMeasuredHeight() + marginTop + marginBottom);
-                childState = combineMeasuredStates(childState, child.getMeasuredState());
+                measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
+                maxWidth = Math.max(maxWidth, child.measuredWidth + marginLeft + marginRight)
+                maxHeight = Math.max(
+                    maxHeight,
+                    child.measuredHeight + marginTop + marginBottom
+                )
+                childState = combineMeasuredStates(childState, child.measuredState)
             }
         }
         // Account for padding too
-        maxWidth += getPaddingLeft() + mForegroundPadding.left + getPaddingRight()
-                + mForegroundPadding.right;
-        maxHeight += getPaddingTop() + mForegroundPadding.top + getPaddingBottom()
-                + mForegroundPadding.bottom;
+        maxWidth += (paddingLeft + mForegroundPadding!!.left + paddingRight
+                + mForegroundPadding!!.right)
+        maxHeight += (paddingTop + mForegroundPadding!!.top + paddingBottom
+                + mForegroundPadding!!.bottom)
 
         // Check against our minimum height and width
-        maxHeight = Math.max(maxHeight, getSuggestedMinimumHeight());
-        maxWidth = Math.max(maxWidth, getSuggestedMinimumWidth());
+        maxHeight = Math.max(maxHeight, suggestedMinimumHeight)
+        maxWidth = Math.max(maxWidth, suggestedMinimumWidth)
 
         // Check against our foreground's minimum height and width
         if (mForegroundDrawable != null) {
-            maxHeight = Math.max(maxHeight, mForegroundDrawable.getMinimumHeight());
-            maxWidth = Math.max(maxWidth, mForegroundDrawable.getMinimumWidth());
+            maxHeight = Math.max(maxHeight, mForegroundDrawable!!.minimumHeight)
+            maxWidth = Math.max(maxWidth, mForegroundDrawable!!.minimumWidth)
         }
-
-        int measuredWidth = resolveSizeAndState(maxWidth, widthMeasureSpec, childState);
-        int measuredHeight = resolveSizeAndState(maxHeight, heightMeasureSpec,
-                childState << MEASURED_HEIGHT_STATE_SHIFT);
-        setMeasuredDimension(measuredWidth, measuredHeight);
+        val measuredWidth = resolveSizeAndState(maxWidth, widthMeasureSpec, childState)
+        val measuredHeight = resolveSizeAndState(
+            maxHeight, heightMeasureSpec,
+            childState shl MEASURED_HEIGHT_STATE_SHIFT
+        )
+        setMeasuredDimension(measuredWidth, measuredHeight)
 
         // determine boxed inset
-        int boxInset = calculateInset(measuredWidth, measuredHeight);
+        val boxInset = calculateInset(measuredWidth, measuredHeight)
         // adjust the the children measures, if necessary
-        for (int i = 0; i < count; i++) {
-            measureChild(widthMeasureSpec, heightMeasureSpec, boxInset, i);
+        for (i in 0 until count) {
+            measureChild(widthMeasureSpec, heightMeasureSpec, boxInset, i)
         }
     }
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        final int count = getChildCount();
-
-        final int parentLeft = getPaddingLeft() + mForegroundPadding.left;
-        final int parentRight = right - left - getPaddingRight() - mForegroundPadding.right;
-
-        final int parentTop = getPaddingTop() + mForegroundPadding.top;
-        final int parentBottom = bottom - top - getPaddingBottom() - mForegroundPadding.bottom;
-
-        for (int i = 0; i < count; i++) {
-            final View child = getChildAt(i);
-            if (child.getVisibility() != GONE) {
-                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
-
-                final int width = child.getMeasuredWidth();
-                final int height = child.getMeasuredHeight();
-
-                int childLeft;
-                int childTop;
-
-                int gravity = lp.gravity;
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        val count = childCount
+        val parentLeft = paddingLeft + mForegroundPadding!!.left
+        val parentRight = right - left - paddingRight - mForegroundPadding!!.right
+        val parentTop = paddingTop + mForegroundPadding!!.top
+        val parentBottom = bottom - top - paddingBottom - mForegroundPadding!!.bottom
+        for (i in 0 until count) {
+            val child = getChildAt(i)
+            if (child.visibility != GONE) {
+                val lp = child.layoutParams as LayoutParams
+                val width = child.measuredWidth
+                val height = child.measuredHeight
+                var childLeft: Int
+                var childTop: Int
+                var gravity = lp.gravity
                 if (gravity == -1) {
-                    gravity = DEFAULT_CHILD_GRAVITY;
+                    gravity = DEFAULT_CHILD_GRAVITY
                 }
-
-                final int layoutDirection = getLayoutDirection();
-                final int absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection);
-                final int verticalGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
-                final int horizontalGravity = gravity & Gravity.HORIZONTAL_GRAVITY_MASK;
-                int desiredInset = calculateInset(getMeasuredWidth(), getMeasuredHeight());
+                val layoutDirection = layoutDirection
+                val absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection)
+                val verticalGravity = gravity and Gravity.VERTICAL_GRAVITY_MASK
+                val horizontalGravity = gravity and Gravity.HORIZONTAL_GRAVITY_MASK
+                val desiredInset = calculateInset(measuredWidth, measuredHeight)
 
                 // If the child's width is match_parent then we can ignore gravity.
-                int leftChildMargin = calculateChildLeftMargin(lp, horizontalGravity, desiredInset);
-                int rightChildMargin = calculateChildRightMargin(lp, horizontalGravity,
-                        desiredInset);
-                if (lp.width == LayoutParams.MATCH_PARENT) {
-                    childLeft = parentLeft + leftChildMargin;
+                val leftChildMargin = calculateChildLeftMargin(lp, horizontalGravity, desiredInset)
+                val rightChildMargin = calculateChildRightMargin(
+                    lp, horizontalGravity,
+                    desiredInset
+                )
+                childLeft = if (lp.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+                    parentLeft + leftChildMargin
                 } else {
-                    switch (absoluteGravity & Gravity.HORIZONTAL_GRAVITY_MASK) {
-                        case Gravity.CENTER_HORIZONTAL:
-                            childLeft = parentLeft + (parentRight - parentLeft - width) / 2
-                                    + leftChildMargin - rightChildMargin;
-                            break;
-                        case Gravity.RIGHT:
-                            childLeft = parentRight - width - rightChildMargin;
-                            break;
-                        case Gravity.LEFT:
-                        default:
-                            childLeft = parentLeft + leftChildMargin;
+                    when (absoluteGravity and Gravity.HORIZONTAL_GRAVITY_MASK) {
+                        Gravity.CENTER_HORIZONTAL -> parentLeft + (parentRight - parentLeft - width) / 2 + leftChildMargin - rightChildMargin
+                        Gravity.RIGHT -> parentRight - width - rightChildMargin
+                        Gravity.LEFT -> parentLeft + leftChildMargin
+                        else -> parentLeft + leftChildMargin
                     }
                 }
 
                 // If the child's height is match_parent then we can ignore gravity.
-                int topChildMargin = calculateChildTopMargin(lp, verticalGravity, desiredInset);
-                int bottomChildMargin = calculateChildBottomMargin(lp, verticalGravity,
-                        desiredInset);
-                if (lp.height == LayoutParams.MATCH_PARENT) {
-                    childTop = parentTop + topChildMargin;
+                val topChildMargin = calculateChildTopMargin(lp, verticalGravity, desiredInset)
+                val bottomChildMargin = calculateChildBottomMargin(
+                    lp, verticalGravity,
+                    desiredInset
+                )
+                childTop = if (lp.height == ViewGroup.LayoutParams.MATCH_PARENT) {
+                    parentTop + topChildMargin
                 } else {
-                    switch (verticalGravity) {
-                        case Gravity.CENTER_VERTICAL:
-                            childTop = parentTop + (parentBottom - parentTop - height) / 2
-                                    + topChildMargin - bottomChildMargin;
-                            break;
-                        case Gravity.BOTTOM:
-                            childTop = parentBottom - height - bottomChildMargin;
-                            break;
-                        case Gravity.TOP:
-                        default:
-                            childTop = parentTop + topChildMargin;
+                    when (verticalGravity) {
+                        Gravity.CENTER_VERTICAL -> parentTop + (parentBottom - parentTop - height) / 2 + topChildMargin - bottomChildMargin
+                        Gravity.BOTTOM -> parentBottom - height - bottomChildMargin
+                        Gravity.TOP -> parentTop + topChildMargin
+                        else -> parentTop + topChildMargin
                     }
                 }
-                child.layout(childLeft, childTop, childLeft + width, childTop + height);
+                child.layout(childLeft, childTop, childLeft + width, childTop + height)
             }
         }
     }
 
-    @Override
-    protected boolean checkLayoutParams(ViewGroup.LayoutParams p) {
-        return p instanceof LayoutParams;
+    override fun checkLayoutParams(p: ViewGroup.LayoutParams): Boolean {
+        return p is LayoutParams
     }
 
-    @Override
-    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams p) {
-        return new LayoutParams(p);
+    override fun generateLayoutParams(p: ViewGroup.LayoutParams): ViewGroup.LayoutParams {
+        return LayoutParams(p)
     }
 
-    private void measureChild(int widthMeasureSpec, int heightMeasureSpec, int desiredMinInset,
-            int i) {
-        final View child = getChildAt(i);
-        final LayoutParams childLayoutParams = (LayoutParams) child.getLayoutParams();
-
-        int gravity = childLayoutParams.gravity;
+    private fun measureChild(
+        widthMeasureSpec: Int, heightMeasureSpec: Int, desiredMinInset: Int,
+        i: Int
+    ) {
+        val child = getChildAt(i)
+        val childLayoutParams = child.layoutParams as LayoutParams
+        var gravity = childLayoutParams.gravity
         if (gravity == -1) {
-            gravity = DEFAULT_CHILD_GRAVITY;
+            gravity = DEFAULT_CHILD_GRAVITY
         }
-        final int verticalGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
-        final int horizontalGravity = gravity & Gravity.HORIZONTAL_GRAVITY_MASK;
-
-        int childWidthMeasureSpec;
-        int childHeightMeasureSpec;
-
-        int leftParentPadding = getPaddingLeft() + mForegroundPadding.left;
-        int rightParentPadding = getPaddingRight() + mForegroundPadding.right;
-        int topParentPadding = getPaddingTop() + mForegroundPadding.top;
-        int bottomParentPadding = getPaddingBottom() + mForegroundPadding.bottom;
+        val verticalGravity = gravity and Gravity.VERTICAL_GRAVITY_MASK
+        val horizontalGravity = gravity and Gravity.HORIZONTAL_GRAVITY_MASK
+        val childWidthMeasureSpec: Int
+        val childHeightMeasureSpec: Int
+        val leftParentPadding = paddingLeft + mForegroundPadding!!.left
+        val rightParentPadding = paddingRight + mForegroundPadding!!.right
+        val topParentPadding = paddingTop + mForegroundPadding!!.top
+        val bottomParentPadding = paddingBottom + mForegroundPadding!!.bottom
 
         // adjust width
-        int totalWidthMargin = leftParentPadding + rightParentPadding + calculateChildLeftMargin(
-                childLayoutParams, horizontalGravity, desiredMinInset) + calculateChildRightMargin(
-                childLayoutParams, horizontalGravity, desiredMinInset);
+        val totalWidthMargin = leftParentPadding + rightParentPadding + calculateChildLeftMargin(
+            childLayoutParams, horizontalGravity, desiredMinInset
+        ) + calculateChildRightMargin(
+            childLayoutParams, horizontalGravity, desiredMinInset
+        )
 
         // adjust height
-        int totalHeightMargin = topParentPadding + bottomParentPadding + calculateChildTopMargin(
-                childLayoutParams, verticalGravity, desiredMinInset) + calculateChildBottomMargin(
-                childLayoutParams, verticalGravity, desiredMinInset);
-
-        childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec, totalWidthMargin,
-                childLayoutParams.width);
-        childHeightMeasureSpec = getChildMeasureSpec(heightMeasureSpec, totalHeightMargin,
-                childLayoutParams.height);
-
-        int maxAllowedWidth = getMeasuredWidth() - totalWidthMargin;
-        int maxAllowedHeight = getMeasuredHeight() - totalHeightMargin;
-        if (child.getMeasuredWidth() > maxAllowedWidth
-                || child.getMeasuredHeight() > maxAllowedHeight) {
-            child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+        val totalHeightMargin = topParentPadding + bottomParentPadding + calculateChildTopMargin(
+            childLayoutParams, verticalGravity, desiredMinInset
+        ) + calculateChildBottomMargin(
+            childLayoutParams, verticalGravity, desiredMinInset
+        )
+        childWidthMeasureSpec = getChildMeasureSpec(
+            widthMeasureSpec, totalWidthMargin,
+            childLayoutParams.width
+        )
+        childHeightMeasureSpec = getChildMeasureSpec(
+            heightMeasureSpec, totalHeightMargin,
+            childLayoutParams.height
+        )
+        val maxAllowedWidth = measuredWidth - totalWidthMargin
+        val maxAllowedHeight = measuredHeight - totalHeightMargin
+        if (child.measuredWidth > maxAllowedWidth
+            || child.measuredHeight > maxAllowedHeight
+        ) {
+            child.measure(childWidthMeasureSpec, childHeightMeasureSpec)
         }
     }
 
-    private int calculateChildLeftMargin(LayoutParams lp, int horizontalGravity, int
-            desiredMinInset) {
-        if (mIsRound && ((lp.boxedEdges & LayoutParams.BOX_LEFT) != 0)) {
-            if (lp.width == LayoutParams.MATCH_PARENT || horizontalGravity == Gravity.LEFT) {
-                return lp.leftMargin + desiredMinInset;
+    private fun calculateChildLeftMargin(
+        lp: LayoutParams,
+        horizontalGravity: Int,
+        desiredMinInset: Int
+    ): Int {
+        if (mIsRound && lp.boxedEdges and LayoutParams.BOX_LEFT != 0) {
+            if (lp.width == ViewGroup.LayoutParams.MATCH_PARENT || horizontalGravity == Gravity.LEFT) {
+                return lp.leftMargin + desiredMinInset
             }
         }
-        return lp.leftMargin;
+        return lp.leftMargin
     }
 
-    private int calculateChildRightMargin(LayoutParams lp, int horizontalGravity, int
-            desiredMinInset) {
-        if (mIsRound && ((lp.boxedEdges & LayoutParams.BOX_RIGHT) != 0)) {
-            if (lp.width == LayoutParams.MATCH_PARENT || horizontalGravity == Gravity.RIGHT) {
-                return lp.rightMargin + desiredMinInset;
+    private fun calculateChildRightMargin(
+        lp: LayoutParams,
+        horizontalGravity: Int,
+        desiredMinInset: Int
+    ): Int {
+        if (mIsRound && lp.boxedEdges and LayoutParams.BOX_RIGHT != 0) {
+            if (lp.width == ViewGroup.LayoutParams.MATCH_PARENT || horizontalGravity == Gravity.RIGHT) {
+                return lp.rightMargin + desiredMinInset
             }
         }
-        return lp.rightMargin;
+        return lp.rightMargin
     }
 
-    private int calculateChildTopMargin(LayoutParams lp, int verticalGravity, int desiredMinInset) {
-        if (mIsRound && ((lp.boxedEdges & LayoutParams.BOX_TOP) != 0)) {
-            if (lp.height == LayoutParams.MATCH_PARENT || verticalGravity == Gravity.TOP) {
-                return lp.topMargin + desiredMinInset;
+    private fun calculateChildTopMargin(
+        lp: LayoutParams,
+        verticalGravity: Int,
+        desiredMinInset: Int
+    ): Int {
+        if (mIsRound && lp.boxedEdges and LayoutParams.BOX_TOP != 0) {
+            if (lp.height == ViewGroup.LayoutParams.MATCH_PARENT || verticalGravity == Gravity.TOP) {
+                return lp.topMargin + desiredMinInset
             }
         }
-        return lp.topMargin;
+        return lp.topMargin
     }
 
-    private int calculateChildBottomMargin(LayoutParams lp, int verticalGravity, int
-            desiredMinInset) {
-        if (mIsRound && ((lp.boxedEdges & LayoutParams.BOX_BOTTOM) != 0)) {
-            if (lp.height == LayoutParams.MATCH_PARENT || verticalGravity == Gravity.BOTTOM) {
-                return lp.bottomMargin + desiredMinInset;
+    private fun calculateChildBottomMargin(
+        lp: LayoutParams,
+        verticalGravity: Int,
+        desiredMinInset: Int
+    ): Int {
+        if (mIsRound && lp.boxedEdges and LayoutParams.BOX_BOTTOM != 0) {
+            if (lp.height == ViewGroup.LayoutParams.MATCH_PARENT || verticalGravity == Gravity.BOTTOM) {
+                return lp.bottomMargin + desiredMinInset
             }
         }
-        return lp.bottomMargin;
+        return lp.bottomMargin
     }
 
-    private int calculateInset(int measuredWidth, int measuredHeight) {
-        int rightEdge = Math.min(measuredWidth, mScreenWidth);
-        int bottomEdge = Math.min(measuredHeight, mScreenHeight);
-        return (int) (FACTOR * Math.max(rightEdge, bottomEdge));
+    private fun calculateInset(measuredWidth: Int, measuredHeight: Int): Int {
+        val rightEdge = Math.min(measuredWidth, mScreenWidth)
+        val bottomEdge = Math.min(measuredHeight, mScreenHeight)
+        return (FACTOR * Math.max(rightEdge, bottomEdge)).toInt()
     }
 
     /**
      * Per-child layout information for layouts that support margins, gravity and boxedEdges.
-     * See {@link R.styleable#BoxInsetLayout_Layout BoxInsetLayout Layout Attributes} for a list
+     * See [BoxInsetLayout Layout Attributes][R.styleable.BoxInsetLayout_Layout] for a list
      * of all child view attributes that this class supports.
      *
      */
-    public static class LayoutParams extends FrameLayout.LayoutParams {
-
-        /** @hide */
+    class LayoutParams : FrameLayout.LayoutParams {
+        /** @hide
+         */
         @RestrictTo(RestrictTo.Scope.LIBRARY)
-        @IntDef({BOX_NONE, BOX_LEFT, BOX_TOP, BOX_RIGHT, BOX_BOTTOM, BOX_ALL})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface BoxedEdges {}
+        @IntDef(BOX_NONE, BOX_LEFT, BOX_TOP, BOX_RIGHT, BOX_BOTTOM, BOX_ALL)
+        @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
+        annotation class BoxedEdges
 
-        /** Default boxing setting. There are no insets forced on the child views. */
-        public static final int BOX_NONE = 0x0;
-        /** The view will force an inset on the left edge of the children. */
-        public static final int BOX_LEFT = 0x01;
-        /** The view will force an inset on the top edge of the children. */
-        public static final int BOX_TOP = 0x02;
-        /** The view will force an inset on the right edge of the children. */
-        public static final int BOX_RIGHT = 0x04;
-        /** The view will force an inset on the bottom edge of the children. */
-        public static final int BOX_BOTTOM = 0x08;
-        /** The view will force an inset on all of the edges of the children. */
-        public static final int BOX_ALL = 0x0F;
-
-        /** Specifies the screen-specific insets for each of the child edges. */
+        /** Specifies the screen-specific insets for each of the child edges.  */
         @BoxedEdges
-        public int boxedEdges = BOX_NONE;
+        var boxedEdges = BOX_NONE
 
         /**
          * Creates a new set of layout parameters. The values are extracted from the supplied
@@ -424,51 +347,48 @@ public class BoxInsetLayout extends ViewGroup {
          * @param context the application environment
          * @param attrs the set of attributes from which to extract the layout parameters' values
          */
-        @SuppressWarnings("ResourceType")
-        public LayoutParams(@NonNull Context context, @Nullable AttributeSet attrs) {
-            super(context, attrs);
-            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BoxInsetLayout_Layout,
-                    0, 0);
-            int boxedEdgesResourceKey = R.styleable.BoxInsetLayout_Layout_layout_boxedEdges;
-            if (!a.hasValueOrEmpty(R.styleable.BoxInsetLayout_Layout_layout_boxedEdges)){
-                boxedEdgesResourceKey = R.styleable.BoxInsetLayout_Layout_boxedEdges;
+        constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+            val a = context.obtainStyledAttributes(
+                attrs, R.styleable.BoxInsetLayout_Layout,
+                0, 0
+            )
+            var boxedEdgesResourceKey = R.styleable.BoxInsetLayout_Layout_layout_boxedEdges
+            if (!a.hasValueOrEmpty(R.styleable.BoxInsetLayout_Layout_layout_boxedEdges)) {
+                boxedEdgesResourceKey = R.styleable.BoxInsetLayout_Layout_boxedEdges
             }
-            boxedEdges = a.getInt(boxedEdgesResourceKey, BOX_NONE);
-            a.recycle();
+            boxedEdges = a.getInt(boxedEdgesResourceKey, BOX_NONE)
+            a.recycle()
         }
 
         /**
          * Creates a new set of layout parameters with the specified width and height.
          *
-         * @param width the width, either {@link #MATCH_PARENT},
-         *              {@link #WRAP_CONTENT} or a fixed size in pixels
-         * @param height the height, either {@link #MATCH_PARENT},
-         *               {@link #WRAP_CONTENT} or a fixed size in pixelsy
+         * @param width the width, either [.MATCH_PARENT],
+         * [.WRAP_CONTENT] or a fixed size in pixels
+         * @param height the height, either [.MATCH_PARENT],
+         * [.WRAP_CONTENT] or a fixed size in pixelsy
          */
-        public LayoutParams(int width, int height) {
-            super(width, height);
-        }
+        constructor(width: Int, height: Int) : super(width, height) {}
 
         /**
          * Creates a new set of layout parameters with the specified width, height
          * and gravity.
          *
-         * @param width the width, either {@link #MATCH_PARENT},
-         *              {@link #WRAP_CONTENT} or a fixed size in pixels
-         * @param height the height, either {@link #MATCH_PARENT},
-         *               {@link #WRAP_CONTENT} or a fixed size in pixels
+         * @param width the width, either [.MATCH_PARENT],
+         * [.WRAP_CONTENT] or a fixed size in pixels
+         * @param height the height, either [.MATCH_PARENT],
+         * [.WRAP_CONTENT] or a fixed size in pixels
          * @param gravity the gravity
          *
          * @see android.view.Gravity
          */
-        public LayoutParams(int width, int height, int gravity) {
-            super(width, height, gravity);
-        }
-
-
-        public LayoutParams(int width, int height, int gravity, @BoxedEdges int boxed) {
-            super(width, height, gravity);
-            boxedEdges = boxed;
+        constructor(width: Int, height: Int, gravity: Int) : super(width, height, gravity) {}
+        constructor(width: Int, height: Int, gravity: Int, @BoxedEdges boxed: Int) : super(
+            width,
+            height,
+            gravity
+        ) {
+            boxedEdges = boxed
         }
 
         /**
@@ -476,18 +396,14 @@ public class BoxInsetLayout extends ViewGroup {
          *
          * @param source The layout params to copy from.
          */
-        public LayoutParams(@NonNull ViewGroup.LayoutParams source) {
-            super(source);
-        }
+        constructor(source: ViewGroup.LayoutParams) : super(source) {}
 
         /**
          * Copy constructor. Clones the width, height and margin values.
          *
          * @param source The layout params to copy from.
          */
-        public LayoutParams(@NonNull ViewGroup.MarginLayoutParams source) {
-            super(source);
-        }
+        constructor(source: MarginLayoutParams) : super(source) {}
 
         /**
          * Copy constructor. Clones the width, height, margin values, and
@@ -495,9 +411,7 @@ public class BoxInsetLayout extends ViewGroup {
          *
          * @param source The layout params to copy from.
          */
-        public LayoutParams(@NonNull FrameLayout.LayoutParams source) {
-            super(source);
-        }
+        constructor(source: FrameLayout.LayoutParams) : super(source) {}
 
         /**
          * Copy constructor. Clones the width, height, margin values, boxedEdges and
@@ -505,10 +419,77 @@ public class BoxInsetLayout extends ViewGroup {
          *
          * @param source The layout params to copy from.
          */
-        public LayoutParams(@NonNull LayoutParams source) {
-            super(source);
-            this.boxedEdges = source.boxedEdges;
-            this.gravity = source.gravity;
+        constructor(source: LayoutParams) : super(source) {
+            boxedEdges = source.boxedEdges
+            gravity = source.gravity
         }
+
+        companion object {
+            /** Default boxing setting. There are no insets forced on the child views.  */
+            const val BOX_NONE = 0x0
+
+            /** The view will force an inset on the left edge of the children.  */
+            const val BOX_LEFT = 0x01
+
+            /** The view will force an inset on the top edge of the children.  */
+            const val BOX_TOP = 0x02
+
+            /** The view will force an inset on the right edge of the children.  */
+            const val BOX_RIGHT = 0x04
+
+            /** The view will force an inset on the bottom edge of the children.  */
+            const val BOX_BOTTOM = 0x08
+
+            /** The view will force an inset on all of the edges of the children.  */
+            const val BOX_ALL = 0x0F
+        }
+    }
+
+    companion object {
+        private const val FACTOR = 0.146447f //(1 - sqrt(2)/2)/2
+        private const val DEFAULT_CHILD_GRAVITY = Gravity.TOP or Gravity.START
+    }
+    /**
+     * Perform inflation from XML and apply a class-specific base style from a theme attribute.
+     * This constructor allows subclasses to use their own base style when they are inflating.
+     *
+     * @param context  The [Context] the view is running in, through which it can
+     * access the current theme, resources, etc.
+     * @param attrs    The attributes of the XML tag that is inflating the view.
+     * @param defStyle An attribute in the current theme that contains a reference to a style
+     * resource that supplies default values for the view. Can be 0 to not look for
+     * defaults.
+     */
+    /**
+     * Constructor that is called when inflating a view from XML. This is called when a view is
+     * being constructed from an XML file, supplying attributes that were specified in the XML
+     * file. This version uses a default style of 0, so the only attribute values applied are those
+     * in the Context's Theme and the given AttributeSet.
+     *
+     *
+     *
+     *
+     * The method onFinishInflate() will be called after all children have been added.
+     *
+     * @param context The [Context] the view is running in, through which it can access
+     * the current theme, resources, etc.
+     * @param attrs   The attributes of the XML tag that is inflating the view.
+     */
+    /**
+     * Simple constructor to use when creating a view from code.
+     *
+     * @param context The [Context] the view is running in, through which it can access
+     * the current theme, resources, etc.
+     */
+    init {
+        // make sure we have a foreground padding object
+        if (mForegroundPadding == null) {
+            mForegroundPadding = Rect()
+        }
+        if (mInsets == null) {
+            mInsets = Rect()
+        }
+        mScreenHeight = Resources.getSystem().displayMetrics.heightPixels
+        mScreenWidth = Resources.getSystem().displayMetrics.widthPixels
     }
 }
